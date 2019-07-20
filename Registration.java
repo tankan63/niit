@@ -3,12 +3,18 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
+import java.sql.*;
+import java.util.regex.*;
 
 public class Registration extends JFrame implements ActionListener {
     JLabel fname, lname,username, dob, email, pass, cpass;
     JTextField tuser, tfname, tlname, tdob, temail;
     JPasswordField ppass, pcpass;
     JButton submit;
+    String dbUser, dbPass, dbUrl;
+    Pattern dobPattern = Pattern.compile("[/d]{2}[[/.][/]]{1}[/d]{2}[[/.][/]]{1}[/d]{2}");
+    Pattern emailPattern = Pattern.compile("[.+]@[/w+][/.][/w]{2,4}");
+    
     public Registration() {
         username =  new JLabel("Username: ");
         username.setBounds(20, 20, 100, 20);
@@ -87,7 +93,40 @@ public class Registration extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
        if(e.getSource()==submit) {
-            
+          Matcher dobMatch = dobPattern.matcher(tdob.getText());
+          Matcher emailMatch = emailPattern.matcher(temail.getText());
+          if(!dobMatch.matches()) {
+            JOptionPane.showMessageDialog(this, "Error. Your Date of Birth is in a wrong format!");
+            new Registration();
+          }
+          else if (!emailMatch.matches()) {
+            JOptionPane.showMessageDialog(this, "Error. Your E-Mail is in a wrong format/ or is Invalid!");
+            new Registration();
+          }
+           try{
+//            String dbUser, dbPass, dbUrl;
+            Connection con = DriverManager.getConnection(dbUrl, dbUser, dbPass);
+            Statement state = con.createStatement();
+            String query = "INSERT INTO USERS VALUES (?,?,?,?,?,?)";
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, tuser.getText());
+            ps.setString(2, ppass.getText());
+            ps.setString(3, pcpass.getText());
+            ps.setString(4, tfname.getText());
+            ps.setString(5, tlname.getText());
+            ps.setString(6, tdob.getText());
+            ps.setString(7, temail.getText());
+            ResultSet rs = ps.executeQuery();
+           }
+           catch (SQLException sqlerr) {
+               System.out.println("Sorry, there seems to have been an error somewhere. Take a look: ");
+               System.out.print(" ");
+               sqlerr.getErrorCode();
+           }
+           finally{
+               JOptionPane.showMessageDialog(this, "Done. Please close the window to exit.");
+               System.exit(0);
+           }
        }
     }
 
