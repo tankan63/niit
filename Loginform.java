@@ -1,9 +1,9 @@
-
 package classwork;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
+import java.sql.*;
 
 public class Loginform extends JFrame implements ActionListener {
 //    JPanel panel;
@@ -11,8 +11,10 @@ public class Loginform extends JFrame implements ActionListener {
     JTextField usertext;
     JPasswordField passtext;
     JButton enter, signup;
+    String dbUser, dbPass, dbUrl;
 
     public Loginform() {
+
 //        panel = new JPanel();
 //        panel.setSize(1400, 900);
        
@@ -54,6 +56,10 @@ public class Loginform extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()==enter) {
+            try{
+            Connection con = DriverManager.getConnection(dbUrl, dbUser, dbPass);
+            }
+            catch (Exception ex){System.out.println("Error! This is it: " +ex);}
             if(usertext.getText().equalsIgnoreCase("root") && passtext.getText().equalsIgnoreCase("root"))
                 JOptionPane.showMessageDialog(this, "Login confirmed!");
             else 
